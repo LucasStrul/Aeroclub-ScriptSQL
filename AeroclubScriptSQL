@@ -1,0 +1,187 @@
+CREATE TABLE avions (
+	num_avion integer NOT NULL,
+	type character varying,
+	taux integer,
+	forfait1 character varying,
+	forfait2 character varying,
+	forfait3 character varying,
+	heures_forfait1 character varying,
+	heures_forfait2 character varying,
+	heures_forfait3 character varying,
+	reduction_semaine character varying,
+	immatriculation character varying,
+	PRIMARY KEY (num_avion)
+);
+
+CREATE TABLE comptes (
+	numero integer NOT NULL,
+	num_membre integer NOT NULL,
+	num_seq integer NOT NULL,
+	date date,
+	credit character varying,
+	commentaire character varying,
+	autocreation character varying,
+	PRIMARY KEY (numero)
+);
+
+CREATE TABLE instructeur (
+	num_instructeur integer NOT NULL,
+	num_civilite integer NOT NULL,
+	nom character varying,
+	prenom character varying,
+	taux_instructeur character varying,
+	adresse character varying,
+	code_postale character varying,
+	ville character varying,
+	tel character varying,
+	portable character varying,
+	fax character varying,
+	commentaire character varying,
+	email character varying,
+	PRIMARY KEY (num_instructeur)
+);
+
+CREATE TABLE membres (
+	num_membre integer NOT NULL,
+	num_civilite character varying NOT NULL,
+	num_qualif integer NOT NULL,
+	nom character varying,
+	prenom character varying,
+	adresse character varying,
+	code_postal character varying,
+	ville character varying,
+	tel character varying,
+	portable character varying,
+	email character varying,
+	motdepasse character varying,
+	num_secu integer NOT NULL,
+	date_vm date,
+	validite_vm character varying,
+	date_sep date,
+	validite_sep character varying,
+	num_badge character varying,
+	profession character varying,
+	date_naissance date,
+	lieu_naissance character varying,
+	carte_federale character varying,
+	date_attestation date,
+	date_theorique_bb date,
+	date_theorique_ppla date,
+	date_bb date,
+	date_ppla date,
+	date_entree date,
+	membreactif character varying,
+	membreinscrit character varying,
+	PRIMARY KEY (num_membre)
+);
+
+CREATE TABLE operation_sur_comptes (
+	num_seq integer NOT NULL,
+	num_membre integer NOT NULL,
+	date date,
+	credit character varying,
+	debit character varying,
+	comment character varying,
+	autocreation boolean,
+	PRIMARY KEY (num_seq, num_membre)
+);
+
+CREATE TABLE qualif (
+	num_qualif integer NOT NULL,
+	qualif character varying,
+	PRIMARY KEY (num_qualif)
+);
+
+CREATE TABLE seq_vol (
+	num_seq integer NOT NULL,
+	num_membre integer NOT NULL,
+	num_avion integer NOT NULL,
+	num_instructeur integer NOT NULL,
+	date date,
+	temps integer,
+	heures_forfait integer,
+	prix_special integer,
+	taux integer,
+	reduction_semaine integer,
+	motif character varying,
+	taux_instructeur integer,
+	forfait_initiation boolean,
+	PRIMARY KEY (num_seq)
+);
+
+CREATE TABLE admin (
+	id SERIAL PRIMARY KEY,
+	email VARCHAR(255) NOT NULL,
+	password VARCHAR(255) NOT NULL
+);
+
+-- Ajouter les clés étrangères à la table comptes
+ALTER TABLE comptes
+    ADD CONSTRAINT fk_comptes_membres FOREIGN KEY (num_membre) REFERENCES membres(num_membre);
+
+ALTER TABLE comptes
+    ADD CONSTRAINT fk_comptes_seq_vol FOREIGN KEY (num_seq) REFERENCES seq_vol(num_seq);
+
+-- Ajouter les clés étrangères à la table membres
+ALTER TABLE membres
+    ADD CONSTRAINT fk_membres_qualif FOREIGN KEY (num_qualif) REFERENCES qualif(num_qualif);
+
+-- Ajouter les clés étrangères à la table operation_sur_comptes
+ALTER TABLE operation_sur_comptes
+    ADD CONSTRAINT fk_operation_sur_comptes_membres FOREIGN KEY (num_membre) REFERENCES membres(num_membre);
+
+ALTER TABLE operation_sur_comptes
+    ADD CONSTRAINT fk_operation_sur_comptes_seq_vol FOREIGN KEY (num_seq) REFERENCES seq_vol(num_seq);
+
+-- Ajouter les clés étrangères à la table seq_vol
+ALTER TABLE seq_vol
+    ADD CONSTRAINT fk_seq_vol_avions FOREIGN KEY (num_avion) REFERENCES avions(num_avion);
+
+ALTER TABLE seq_vol
+    ADD CONSTRAINT fk_seq_vol_instructeur FOREIGN KEY (num_instructeur) REFERENCES instructeur(num_instructeur);
+
+ALTER TABLE seq_vol
+    ADD CONSTRAINT fk_seq_vol_membres FOREIGN KEY (num_membre) REFERENCES membres(num_membre);
+
+
+-- Insertions pour la table avions
+INSERT INTO avions (num_avion, type, taux, forfait1, forfait2, forfait3, heures_forfait1, heures_forfait2, heures_forfait3, reduction_semaine, immatriculation)
+VALUES 
+(1, 'PA28', 127, '1161.0000', '0.0000', '1387.0000', '10', '0', '10', '4.0000', 'PA28 F-GDJF'),
+(2, 'PA28', 127, '1161.0000', '0.0000', '1387.0000', '10', '0', '10', '4.0000', 'PA28 F-GIED');
+
+INSERT INTO qualif (num_qualif, qualif)
+VALUES 
+(0, NULL),
+(1, 'ST'),
+(2, 'BB'),
+(3, 'PPL-A'),
+(4, 'TT'),
+(5, 'PP');
+
+-- Insertions pour la table instructeur
+INSERT INTO instructeur (num_instructeur, num_civilite, nom, prenom, taux_instructeur, adresse, code_postale, ville, tel, portable, fax, commentaire, email)
+VALUES (1, 1, 'HALLU', 'Pierre', '25.0000', '', '', '', '', '', '', '', '');
+
+
+-- Insertions pour la table seq_vol
+INSERT INTO seq_vol (num_seq, num_membre, num_avion, num_instructeur, date, temps, heures_forfait, prix_special, taux, reduction_semaine, motif, taux_instructeur, forfait_initiation)
+VALUES 
+(1, 1, 1, 1, '2002-01-01', 0, 10, 0, 0, 0, NULL, 0, 'f'),
+(2, 1, 1, 1, '2002-01-01', 0, 4, 0, 0, 0, NULL, 0, 'f');
+INSERT INTO membres (num_membre, num_civilite, num_qualif, nom, prenom, adresse, code_postal, ville, tel, portable, email, motdepasse, num_secu, date_vm, validite_vm, date_sep, validite_sep, num_badge, profession, date_naissance, lieu_naissance, carte_federale, date_attestation, date_theorique_bb, date_theorique_ppla, date_bb, date_ppla, date_entree, membreactif, membreinscrit)
+VALUES 
+(4, 'Mme.', 0, 'STRULLU1', 'lucas1', '1786, rue de la 1', '598201', 'Gravelines1', '0328111111', '0613659111', 'lucas@aeroclub.fr', '$2a$10$S5ri/VE8wxTHra7iMpSa7Omv9vWV9jfdqFV9sUOj0eChZW7VxH8f6', 1, '2023-08-08', '2000-03-03', '2000-07-07', '2000-07-07', '48689GH', 'prof1', '1952-06-06', 'QUIMPER', '846886FG8', '2021-01-01', '2020-02-02', '2019-03-03', '2018-04-04', '2017-05-05', '2016-09-09', 1, 1),
+(1, 'M.', 0, 'AVERLANT', 'Pierre', '1786, rue de la Brasserie', '59140', 'Dunkerque', '0328112233', '0613659154', 'averlant@gmail.com', '$2a$10$S5ri/VE8wxTHra7iMpSa7Omv9vWV9jfdqFV9sUOj0eChZW7VxH8f6', 0, NULL, 'certif2', NULL, 'certif1', '5489889ERr', 'Pompier', NULL, 'Dunkerque', '69DFG41', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0);
+
+-- Insertions pour la table comptes
+INSERT INTO comptes (numero, num_membre, num_seq, date, credit, commentaire, autocreation)
+VALUES 
+(1, 1, 1, '2002-01-01', '0.0000', 'Initialisation du Compte', 'False'),
+(2, 1, 2, '2002-01-01', '0.0000', 'Initialisation du Compte', 'False');
+
+
+-- Insertions pour la table operation_sur_comptes
+INSERT INTO operation_sur_comptes (num_seq, num_membre, date, credit, debit, comment, autocreation)
+VALUES (1, 1, '2002-01-01', '0.0000', '130.2300', 'Initialisation du Compte', 'f');
+
